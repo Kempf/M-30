@@ -57,6 +57,8 @@ public class Interact : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+                Screen.lockCursor = true;
+        
 				//Raycast and hit ID
 				Vector3 Forward = transform.TransformDirection (Vector3.forward);
 				if (Physics.Raycast (transform.position, Forward, out hit, 2f)){
