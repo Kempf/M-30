@@ -14,6 +14,9 @@ public class CompassScript : MonoBehaviour {
 	
 		BearDeg = transform.rotation.eulerAngles.y;
 		BearDiv = Mathf.Round (BearDeg * 16.666f);
+        if (BearDiv > 3000) {
+            BearDiv -= 6000;
+        }
 		BearingDeg.text = Mathf.Round (BearDeg).ToString();
 		BearingDiv.text = BearDiv.ToString();
 
