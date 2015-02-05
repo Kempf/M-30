@@ -51,6 +51,7 @@ public class Interact : MonoBehaviour {
 	public void AddScore(){
 		Scoreint += 1;
 		Scoretxt.text = Scoreint.ToString ();
+        Radio.text = "";
 		}
 
 	// Update is called once per frame
