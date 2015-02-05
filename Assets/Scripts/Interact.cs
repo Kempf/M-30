@@ -58,6 +58,7 @@ public class Interact : MonoBehaviour {
 	void Update () {
 
                 Screen.lockCursor = true;
+				Screen.showCursor = false;
         
 				//Raycast and hit ID
 				Vector3 Forward = transform.TransformDirection (Vector3.forward);
