@@ -30,12 +30,12 @@ public class TraverseScript : MonoBehaviour {
 	public void Interact1 () {
 
 		if (Input.GetButton ("Focus"))
-			speed = 100;
+			speed = 2f;
 		else
-			speed = 10;
+			speed = 0.3f;
 
 		//trav value
-		TraverseMod = (Input.GetAxis ("LeftRight"))/speed;
+		TraverseMod = (Input.GetAxis ("Mouse Scroll"))/speed;
 		//limits
 		if (Traverse <= maxTraverse && Traverse >= -maxTraverse)
 			Traverse += TraverseMod;

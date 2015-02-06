@@ -33,6 +33,8 @@ public class Interact : MonoBehaviour {
 	private MouseLook MouseLook2;
 	private FPSInputControllerC Controller;
 
+	private TraverseScript Trav;
+
 	// Use this for initialization
 	void Awake () {
 		//clearing text
@@ -46,6 +48,8 @@ public class Interact : MonoBehaviour {
 		MouseLook1 = Player.GetComponent <MouseLook>();
 		MouseLook2 = Main.GetComponent <MouseLook>();
 		Controller = Player.GetComponent <FPSInputControllerC>();
+
+		Trav = GameObject.FindGameObjectWithTag ("Traverse").gameObject.GetComponent<TraverseScript> ();
 	}
 
 	public void AddScore(){
@@ -106,7 +110,7 @@ public class Interact : MonoBehaviour {
 
 						} else if (tagID.text == "Traverse") {		
 								//calling and using traverse script
-								TraverseScript Trav = hit.collider.gameObject.GetComponent<TraverseScript> ();
+								//Trav = hit.collider.gameObject.GetComponent<TraverseScript> ();
 								Trav.Interact1 ();
 								TravDiv = Mathf.Round (Trav.Traverse * 16.666f);
 								Data.text = TravDiv.ToString ();
@@ -143,7 +147,9 @@ public class Interact : MonoBehaviour {
 								BreechScript Brch = hit.collider.gameObject.GetComponent<BreechScript> ();
 								Brch.Interact1 ();
 
-						} else if (tagID.text == "Scope" && Input.GetButtonDown ("Interact 1")) {
+						} else if (tagID.text == "Scope") {
+								Trav.Interact1 ();
+								if (Input.GetButtonDown ("Interact 1")){
 								//switching cams
 								Main.enabled = !Main.enabled;
 								ScopeCam.enabled = !ScopeCam.enabled;
@@ -151,7 +157,7 @@ public class Interact : MonoBehaviour {
 								MouseLook1.enabled = !MouseLook1.enabled;
 								MouseLook2.enabled = !MouseLook2.enabled;
 								Controller.enabled = !Controller.enabled;
-
+								}
 						} else if (tagID.text == "Radio" && Input.GetButtonDown ("Interact 1")) {
 
 								GameObject Target = GameObject.FindGameObjectWithTag ("Target");	
