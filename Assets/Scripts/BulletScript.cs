@@ -30,7 +30,7 @@ public class BulletScript : MonoBehaviour {
 		}
 
 	void FixedUpdate () {
-
+		print (Time.deltaTime * rigidbody.velocity.magnitude);
 		nowPos = new Vector3 (transform.position.x, transform.position.y, transform.position.z);
 
 		dir = nowPos - lastPos;
@@ -47,9 +47,9 @@ public class BulletScript : MonoBehaviour {
 		GameObject Shell = transform.Find ("BulletGO").gameObject;
 		Shell.transform.localEulerAngles = new Vector3 (0f, 0f, -spin);
 
-		if (Physics.Raycast (transform.position, dir, out Hit, rigidbody.velocity.magnitude)) {
+		if (Physics.Raycast (transform.position, dir, out Hit, Time.deltaTime * rigidbody.velocity.magnitude)) {
 
-				transform.position = Hit.transform.position;
+			//	transform.position = Hit.transform.position;
 				Explode ();
 
 				}
