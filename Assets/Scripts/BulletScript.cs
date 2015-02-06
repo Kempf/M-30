@@ -19,6 +19,8 @@ public class BulletScript : MonoBehaviour {
 
 	private float spin;
 
+	private RaycastHit Hit;
+
 	void Awake () {
 
 		origin = GameObject.Find ("origin");
@@ -45,16 +47,20 @@ public class BulletScript : MonoBehaviour {
 		GameObject Shell = transform.Find ("BulletGO").gameObject;
 		Shell.transform.localEulerAngles = new Vector3 (0f, 0f, -spin);
 
-		if (Physics.Raycast (transform.position, dir, 6f))
-			Explode () ;
+		if (Physics.Raycast (transform.position, dir, out Hit, rigidbody.velocity.magnitude)) {
+
+				transform.position = Hit.transform.position;
+				Explode ();
+
+				}
 
 		lastPos = nowPos;
 
 		}
 
-	void OnCollisionEnter(Collision collision) {
-		Explode ();
-		}
+//	void OnCollisionEnter(Collision collision) {
+//		Explode ();
+//		}
 
 	public void Explode () {
 
