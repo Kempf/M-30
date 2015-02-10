@@ -12,7 +12,7 @@ public class Interact : MonoBehaviour {
 	//Cameras
 	public Camera Main;
 	public Camera BinoCam;
-	public Camera ScopeCam;
+	private Camera ScopeCam;
 	//desired object help position
 	public GameObject Position;
 	//hands free? and what is in hands?
@@ -49,6 +49,7 @@ public class Interact : MonoBehaviour {
 		MouseLook2 = Main.GetComponent <MouseLook>();
 		Controller = Player.GetComponent <FPSInputControllerC>();
 
+		ScopeCam = GameObject.Find ("ScopeCamera").camera;
 		Trav = GameObject.FindGameObjectWithTag ("Traverse").gameObject.GetComponent<TraverseScript> ();
 	}
 
