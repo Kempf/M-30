@@ -10,6 +10,9 @@ public class Interact : MonoBehaviour {
 	public Text Data;
 	public Text Radio;
 	//Cameras
+	public GameObject PlayerCamPos;
+	public GameObject ScopeCamPos;
+	private bool inScope;
 	public Camera Main;
 	private Camera ScopeCam;
 	//desired object help position
@@ -26,13 +29,16 @@ public class Interact : MonoBehaviour {
 	public Text Scoretxt;
 	public int Scoreint;
 
-	private GameObject Player;
+	public GameObject Player;
 
 	private MouseLook MouseLook1;
 	private MouseLook MouseLook2;
 	private FPSInputControllerC Controller;
 
 	private TraverseScript Trav;
+
+	public float NormFOV;
+	public float ScopeFOV;
 
 	// Use this for initialization
 	void Awake () {
@@ -42,11 +48,12 @@ public class Interact : MonoBehaviour {
 		Scoretxt.text = "0";
 		Scoreint = 0;
 
-		Player = Main.transform.parent.gameObject;
-
 		MouseLook1 = Player.GetComponent <MouseLook>();
-		MouseLook2 = Main.GetComponent <MouseLook>();
+		MouseLook2 = PlayerCamPos.GetComponent <MouseLook>();
 		Controller = Player.GetComponent <FPSInputControllerC>();
+
+		inScope = false;
+		ScopeCamPos = GameObject.Find ("ScopeCamPos");
 
 		ScopeCam = GameObject.Find ("ScopeCamera").camera;
 		Trav = GameObject.FindGameObjectWithTag ("Traverse").gameObject.GetComponent<TraverseScript> ();
@@ -64,12 +71,22 @@ public class Interact : MonoBehaviour {
                 Screen.lockCursor = true;
 				Screen.showCursor = false;
         
-				//Raycast and hit ID
-				Vector3 Forward = transform.TransformDirection (Vector3.forward);
-				if (Physics.Raycast (transform.position, Forward, out hit, 2f)){
-						tagID.text = hit.collider.tag;
-				}else{ 
-						tagID.text = "";
+		if (inScope == false) {
+						//Raycast and hit ID
+						Vector3 Forward = transform.TransformDirection (Vector3.forward);
+						if (Physics.Raycast (transform.position, Forward, out hit, 2f)) {
+								tagID.text = hit.collider.tag;
+						} else { 
+								tagID.text = "";
+						}
+			
+						Main.transform.position = PlayerCamPos.transform.position;
+						Main.transform.rotation = PlayerCamPos.transform.rotation;
+						Main.camera.fieldOfView = NormFOV;
+				} else {
+						Main.transform.position = ScopeCamPos.transform.position;
+						Main.transform.rotation = ScopeCamPos.transform.rotation;
+						Main.camera.fieldOfView = ScopeFOV;
 				}
 
 		if (tagID.text == "Chamber" && IteminHands == "Position/Round(Clone)" && Input.GetButtonDown ("Interact 1")) {
@@ -138,8 +155,12 @@ public class Interact : MonoBehaviour {
 								Trav.Interact1 ();
 								if (Input.GetButtonDown ("Interact 1")){
 								//switching cams
-								Main.enabled = !Main.enabled;
-								ScopeCam.enabled = !ScopeCam.enabled;
+								
+
+								inScope = !inScope;
+
+					//			Main.enabled = !Main.enabled;
+					//			ScopeCam.enabled = !ScopeCam.enabled;
 
 								MouseLook1.enabled = !MouseLook1.enabled;
 								MouseLook2.enabled = !MouseLook2.enabled;
