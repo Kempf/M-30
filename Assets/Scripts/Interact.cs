@@ -11,7 +11,6 @@ public class Interact : MonoBehaviour {
 	public Text Radio;
 	//Cameras
 	public Camera Main;
-	public Camera BinoCam;
 	private Camera ScopeCam;
 	//desired object help position
 	public GameObject Position;
@@ -73,19 +72,6 @@ public class Interact : MonoBehaviour {
 						tagID.text = "";
 				}
 
-		if (Input.GetButtonDown ("Bino") && ScopeCam.enabled == false) {
-			//binos
-			Main.enabled = !Main.enabled;
-			BinoCam.enabled = !BinoCam.enabled;
-			if (BinoCam.enabled == true){
-				MouseLook1.sensitivityX = MouseLook1.sensitivityX/6;
-				MouseLook2.sensitivityY = MouseLook2.sensitivityY/6; 
-			}else{
-				MouseLook1.sensitivityX = MouseLook1.sensitivityX*6;
-				MouseLook2.sensitivityY = MouseLook2.sensitivityY*6; 
-			}
-		}
-
 		if (tagID.text == "Chamber" && IteminHands == "Position/Round(Clone)" && Input.GetButtonDown ("Interact 1")) {
 			//loading round into chamber
 					GameObject RoundtoLoad = transform.Find (IteminHands).gameObject;
@@ -100,7 +86,7 @@ public class Interact : MonoBehaviour {
 
 
 		//check if holding something
-		if (HandsFree == true && BinoCam.enabled == false ) {
+		if (HandsFree == true) {
 						//checking tags etc.
 						if (tagID.text == "Elevation") {
 								//calling and using elevation script
