@@ -14,7 +14,8 @@ public class Interact : MonoBehaviour {
 	public GameObject ScopeCamPos;
 	private bool inScope;
 	public Camera Main;
-	private Camera ScopeCam;
+	public Canvas MainCanvas;
+	public Canvas ScopeCanvas;
 	//desired object help position
 	public GameObject Position;
 	//hands free? and what is in hands?
@@ -54,8 +55,7 @@ public class Interact : MonoBehaviour {
 
 		inScope = false;
 		ScopeCamPos = GameObject.Find ("ScopeCamPos");
-
-		ScopeCam = GameObject.Find ("ScopeCamera").camera;
+	
 		Trav = GameObject.FindGameObjectWithTag ("Traverse").gameObject.GetComponent<TraverseScript> ();
 	}
 
@@ -156,9 +156,10 @@ public class Interact : MonoBehaviour {
 								if (Input.GetButtonDown ("Interact 1")){
 								//switching cams
 								
-
+								MainCanvas.enabled = !MainCanvas.enabled;
+								ScopeCanvas.enabled = !ScopeCanvas.enabled;
 								inScope = !inScope;
-
+								
 					//			Main.enabled = !Main.enabled;
 					//			ScopeCam.enabled = !ScopeCam.enabled;
 
