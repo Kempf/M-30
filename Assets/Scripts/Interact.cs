@@ -67,7 +67,7 @@ public class Interact : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-
+				
                 Screen.lockCursor = true;
 				Screen.showCursor = false;
         
@@ -89,16 +89,18 @@ public class Interact : MonoBehaviour {
 						Main.camera.fieldOfView = ScopeFOV;
 				}
 
-		if (tagID.text == "Chamber" && IteminHands == "Position/Round(Clone)" && Input.GetButtonDown ("Interact 1")) {
+		if (tagID.text == "Chamber" && IteminHands == "Position/Round(Clone)" && Input.GetButtonDown ("Interact 1") ) {
+			ChamberScript Cham = hit.collider.gameObject.GetComponent<ChamberScript> ();
+			if (Cham.Loaded == false){
 			//loading round into chamber
 					GameObject RoundtoLoad = transform.Find (IteminHands).gameObject;
 					Destroy (RoundtoLoad);
-					ChamberScript Cham = hit.collider.gameObject.GetComponent<ChamberScript> ();
+				//	ChamberScript Cham = hit.collider.gameObject.GetComponent<ChamberScript> ();
 					Cham.Load ();
 					IteminHands = "";
 					HandsFree = true;
 			}
-
+		}
 
 
 
