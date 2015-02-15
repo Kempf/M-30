@@ -15,9 +15,18 @@ public class NetworkManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Connect () {
-		Debug.Log ("Connect");
-		PhotonNetwork.ConnectUsingSettings ( "M-30 A v001" );
+
+		if (PersistantDetails.Multiplayer == false) {
+			print ("offline mode");
+			PhotonNetwork.offlineMode = true;
+			PhotonNetwork.CreateRoom (null);
+		} else {
+			print ("online mode");
+			PhotonNetwork.offlineMode = false;
+			Debug.Log ("Connect");
+			PhotonNetwork.ConnectUsingSettings ("M-30 A v001");
 		}
+	}
 
 	void OnJoinedLobby () {
 		Debug.Log ("OnJoinedLobby");
