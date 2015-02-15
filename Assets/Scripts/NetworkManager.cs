@@ -3,8 +3,10 @@ using System.Collections;
 
 public class NetworkManager : MonoBehaviour {
 
-	public GameObject Spawn;
-	public Camera MenuCamera;
+	public GameObject GSpawn;
+	public GameObject PSpawn;
+	public GameObject MenuCamera;
+	public GameObject Gameinterface;
 
 	// Use this for initialization
 	void Start () {
@@ -29,12 +31,21 @@ public class NetworkManager : MonoBehaviour {
 
 	void OnJoinedRoom () {
 		Debug.Log ("OnJoinedRoom");
+
 		SpawnMyPlayer ();
 		}
 
 	void SpawnMyPlayer(){
-		MenuCamera.enabled = false;
-		GameObject MyPlayer = PhotonNetwork.Instantiate ("Player", Spawn.transform.position, Spawn.transform.rotation, 0);
+		if (!GameObject.Find ("M-30(Clone)")){
+			PhotonNetwork.Instantiate ("M-30", GSpawn.transform.position, GSpawn.transform.rotation, 0);
+
+		}else{
+			Debug.Log ("Already a Gun");
+
+		}
+		MenuCamera.SetActive (false);
+		Gameinterface.SetActive (true);
+		GameObject MyPlayer = PhotonNetwork.Instantiate ("Player", PSpawn.transform.position, PSpawn.transform.rotation, 0);
 		MyPlayer.GetComponent <MouseLook> ().enabled = true;
 		MyPlayer.GetComponent <CharacterMotorC> ().enabled = true;
 		MyPlayer.GetComponent<FPSInputControllerC> ().enabled = true;

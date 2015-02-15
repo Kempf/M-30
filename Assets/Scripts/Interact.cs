@@ -77,8 +77,9 @@ public class Interact : MonoBehaviour {
 
 		inScope = false;
 		ScopeCamPos = GameObject.Find ("ScopeCamPos");
-	
+
 		Trav = GameObject.FindGameObjectWithTag ("Traverse").gameObject.GetComponent<TraverseScript> ();
+
 	}
 
 	public void AddScore(){
@@ -90,6 +91,8 @@ public class Interact : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 				
+
+
                 Screen.lockCursor = true;
 				Screen.showCursor = false;
         
