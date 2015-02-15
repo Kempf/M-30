@@ -24,7 +24,8 @@ public class SpawnerScript : MonoBehaviour {
 	void Update () {
 	
 		if (GameObject.FindGameObjectWithTag ("Target")) {
-				} else
+				} else if (GameObject.FindGameObjectWithTag ("Player")) {
 						Spawn ();
+				}
 		}
 }

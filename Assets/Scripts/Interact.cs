@@ -7,15 +7,22 @@ public class Interact : MonoBehaviour {
 	public RaycastHit hit;
 	//UI texts
 	public Text tagID;
+	public GameObject tagIDGO;
 	public Text Data;
+	public GameObject DataGO;
 	public Text Radio;
+	public GameObject RadioGO;
+	public Text Scoretxt;
+	public GameObject ScoretxtGO;
 	//Cameras
 	public GameObject PlayerCamPos;
 	public GameObject ScopeCamPos;
 	private bool inScope;
 	public Camera Main;
 	public Canvas MainCanvas;
+	public GameObject MainCanvasGO;
 	public Canvas ScopeCanvas;
+	public GameObject ScopeCanvasGO;
 	//desired object help position
 	public GameObject Position;
 	//hands free? and what is in hands?
@@ -26,8 +33,7 @@ public class Interact : MonoBehaviour {
 	private float TravDiv;
 
 	public GameObject Round;
-
-	public Text Scoretxt;
+	
 	public int Scoreint;
 
 	public GameObject Player;
@@ -43,6 +49,22 @@ public class Interact : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
+
+		MainCanvasGO = GameObject.Find ("Canvas - Main");
+		MainCanvas = MainCanvasGO.GetComponent<Canvas> ();
+		ScopeCanvasGO = GameObject.Find ("Canvas - Scope");
+		ScopeCanvas = ScopeCanvasGO.GetComponent<Canvas> ();
+
+		tagIDGO = GameObject.Find ("TagID");
+		DataGO = GameObject.Find ("Data");
+		RadioGO = GameObject.Find ("Radio");
+		ScoretxtGO = GameObject.Find ("Score");
+
+		tagID = tagIDGO.GetComponent<Text> ();
+		Data = DataGO.GetComponent<Text> ();
+		Radio = RadioGO.GetComponent<Text> ();
+		Scoretxt = ScoretxtGO.GetComponent<Text> ();
+
 		//clearing text
 		tagID.text = "";
 		Data.text = "";

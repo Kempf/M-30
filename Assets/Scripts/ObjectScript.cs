@@ -20,8 +20,8 @@ public class ObjectScript : MonoBehaviour {
 		origin = GameObject.Find ("origin");
 		DistString = (Mathf.Round ((Vector3.Distance (transform.position, origin.transform.position)))).ToString ();
 
-		GameObject InteractHandlerObj = GameObject.Find ("Interact Control");
-		InteractScript = InteractHandlerObj.gameObject.GetComponent<Interact> ();
+//		GameObject InteractHandlerObj = GameObject.Find ("Interact Control");
+//		InteractScript = InteractHandlerObj.gameObject.GetComponent<Interact> ();
 		doOnce = true;
 		}
 
