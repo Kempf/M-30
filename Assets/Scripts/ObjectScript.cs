@@ -10,11 +10,9 @@ public class ObjectScript : MonoBehaviour {
 	private GameObject Explosion;
 	private GameObject origin;
 
-	public string DistString;
+	public static string DistString;
 
 	private bool doOnce;
-
-	private Interact InteractScript;
 
 	void Awake () {
 		origin = GameObject.Find ("origin");
@@ -40,7 +38,7 @@ public class ObjectScript : MonoBehaviour {
 		if (Distance < KillRad && doOnce == true) {
 			Destroy (gameObject, Distance / 2);
 			renderer.material.color = Color.black;
-			InteractScript.AddScore ();
+			Interact.Scoreint += 1;
 			doOnce = false;
 		}
 	}

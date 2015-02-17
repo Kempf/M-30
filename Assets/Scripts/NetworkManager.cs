@@ -8,6 +8,8 @@ public class NetworkManager : MonoBehaviour {
 	public GameObject MenuCamera;
 	public GameObject Gameinterface;
 
+	private bool MakeGun = false;
+
 	// Use this for initialization
 	void Start () {
 		Connect ();
@@ -18,6 +20,7 @@ public class NetworkManager : MonoBehaviour {
 
 		if (PersistantDetails.Multiplayer == false) {
 			print ("offline mode");
+			MakeGun = true;
 			PhotonNetwork.offlineMode = true;
 			PhotonNetwork.CreateRoom (null);
 		} else {
@@ -35,6 +38,7 @@ public class NetworkManager : MonoBehaviour {
 
 	void OnPhotonRandomJoinFailed () {
 		Debug.Log ("OnPhotonRandomJoinFailed");
+		MakeGun = true;
 		PhotonNetwork.CreateRoom (null);
 		}
 
@@ -45,12 +49,8 @@ public class NetworkManager : MonoBehaviour {
 		}
 
 	void SpawnMyPlayer(){
-		if (!GameObject.Find ("M-30(Clone)")){
+		if (MakeGun == true){
 			PhotonNetwork.Instantiate ("M-30", GSpawn.transform.position, GSpawn.transform.rotation, 0);
-
-		}else{
-			Debug.Log ("Already a Gun");
-
 		}
 		MenuCamera.SetActive (false);
 		Gameinterface.SetActive (true);

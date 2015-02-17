@@ -5,43 +5,29 @@ public class ElevationScript : MonoBehaviour {
 
 	private float maxElevation = 63.5f;
 	private float minElevation = -3f;
-
 	public GameObject Pivot;
-
-	public float Elevation;
-
+	public float ElevationAngle;
 	private float ElevationMod;
-
 	public float speed;
 
-	// Use this for initialization
-	void Start () {
-	
-		Elevation = 0f;
-
+	void Update () {
+		Interact.ElevDiv = Mathf.Round (ElevationAngle * 16.666f);
 	}
-	
-	// Update is called once per frame
-	public void Interact1 () {
 
-		if (Input.GetButton ("Focus"))
-						speed = 2f;
-				else
-						speed = 0.3f;
-
-		//elev value
-		ElevationMod = (Input.GetAxis ("Mouse Scroll"))/speed;
+	[RPC]
+	public void Elevation(float ElevationMod){
+		
 		//limits
-		if (Elevation <= maxElevation && Elevation >= minElevation)
-						Elevation += ElevationMod;
+		if (ElevationAngle <= maxElevation && ElevationAngle >= -maxElevation)
+			ElevationAngle += ElevationMod;
 		//limits
-		if (Elevation > maxElevation)
-						Elevation = maxElevation;
+		if (ElevationAngle > maxElevation)
+			ElevationAngle = maxElevation;
 		//more limits
-		if (Elevation < minElevation)
-			Elevation = minElevation;
+		if (ElevationAngle < minElevation)
+			ElevationAngle = minElevation;
 		//applying rotation
-		Pivot.transform.localEulerAngles = new Vector3 (Elevation, 0f, 0f);
-		transform.localEulerAngles = new Vector3 (Elevation * 20f, 0f, 0f);
+		Pivot.transform.localEulerAngles = new Vector3 (ElevationAngle, 0f, 0f);
+		transform.localEulerAngles = new Vector3 (ElevationAngle * 20f, 0f, 0f);
 	}
 }

@@ -5,6 +5,7 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 
 	private Vector3 realPos;
 	private Quaternion realRot;
+	public float Speed = .1f;
 
 	// Use this for initialization
 	void Start () {
@@ -15,8 +16,8 @@ public class NetworkCharacter : Photon.MonoBehaviour {
 	void FixedUpdate () {
 		if (photonView.isMine) {
 		} else {
-			transform.position = Vector3.Lerp (transform.position, realPos, .1f);
-			transform.rotation = Quaternion.Lerp (transform.rotation, realRot, .1f);
+			transform.position = Vector3.Lerp (transform.position, realPos, Speed);
+			transform.rotation = Quaternion.Lerp (transform.rotation, realRot, Speed);
 		}
 	}
 

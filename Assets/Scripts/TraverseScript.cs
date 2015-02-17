@@ -7,7 +7,7 @@ public class TraverseScript : MonoBehaviour {
 
 	public GameObject Pivot;
 
-	public float Traverse;
+	public float TraverseAngle;
 
 	private float zRot;
 	private float yRot;
@@ -18,36 +18,27 @@ public class TraverseScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
-		Traverse = 0f;
-
 		zRot = transform.localEulerAngles.z;
 		yRot = transform.localEulerAngles.y;
-
 	}
-	
-	// Update is called once per frame
-	public void Interact1 () {
 
-		if (Input.GetButton ("Focus"))
-			speed = 2f;
-		else
-			speed = 0.3f;
+	void Update () {
+		Interact.TravDiv = Mathf.Round (TraverseAngle * 16.666f);
+	}
 
-		//trav value
-		TraverseMod = (Input.GetAxis ("Mouse Scroll"))/speed;
+	[RPC]
+	public void Traverse(float TraverseMod){
 		//limits
-		if (Traverse <= maxTraverse && Traverse >= -maxTraverse)
-			Traverse += TraverseMod;
+		if (TraverseAngle <= maxTraverse && TraverseAngle >= -maxTraverse)
+			TraverseAngle += TraverseMod;
 		//limits
-		if (Traverse > maxTraverse)
-			Traverse = maxTraverse;
+		if (TraverseAngle > maxTraverse)
+			TraverseAngle = maxTraverse;
 		//more limits
-		if (Traverse < -maxTraverse)
-			Traverse = -maxTraverse;
+		if (TraverseAngle < -maxTraverse)
+			TraverseAngle = -maxTraverse;
 		//applying rotation
-		Pivot.transform.localEulerAngles = new Vector3 (0f, Traverse, 0f);
-		transform.localEulerAngles = new Vector3 (Traverse * -20f, yRot, zRot);
-
+		Pivot.transform.localEulerAngles = new Vector3 (0f, TraverseAngle, 0f);
+		transform.localEulerAngles = new Vector3 (TraverseAngle * -20f, yRot, zRot);
 	}
 }

@@ -5,25 +5,24 @@ public class FireScript : MonoBehaviour {
 
 	public Rigidbody Bullet;
 	public GameObject FirePos;
-
 	public ParticleSystem pSFire;
-
-
 
 	public float randX;
 	public float randY;
 
 	public Quaternion randRot;
 
-	void Fire(){
+	[RPC]
+	public void FireCheck(){
+		randX = Random.Range (-1f,1f) + Random.Range (-1f,1f) + Random.Range (-1f,1f);
+		randY = Random.Range (-1f,1f) + Random.Range (-1f,1f) + Random.Range (-1f,1f);
 
-		ChamberScript Cham = transform.Find ("ChamberCol").gameObject.GetComponent<ChamberScript> ();
-		BreechScript Bree = transform.Find ("BreechDoor").gameObject.GetComponent<BreechScript> ();
-
-		if (Cham.Loaded == true && Bree.open == false) {
-
-			randX = Random.Range (-1f,1f) + Random.Range (-1f,1f) + Random.Range (-1f,1f);
-			randY = Random.Range (-1f,1f) + Random.Range (-1f,1f) + Random.Range (-1f,1f);
+		if (ChamberScript.Loaded == true && BreechScript.open == false) {
+			GetComponent<PhotonView>().RPC ("Fire", PhotonTargets.All, randX, randY);
+		}
+	}
+	[RPC]
+	public void Fire(float randX, float randY){
 
 			randRot.eulerAngles = new Vector3 (randX/30, randY/30, 0f);
 
@@ -34,11 +33,12 @@ public class FireScript : MonoBehaviour {
 				//recoil
 				transform.localPosition = new Vector3 (0, 0, .6f);
 				//unloading
-				Cham.Loaded = false;
-				Bree.EmpCase = true;
+				ChamberScript Cham = transform.Find ("ChamberCol").gameObject.GetComponent<ChamberScript> ();
+				BreechScript Bree = transform.Find ("BreechDoor").gameObject.GetComponent<BreechScript> ();
+				ChamberScript.Loaded = false;
+				BreechScript.EmpCase = true;
 
-			}
-		}
+	}
 
 	// Update is called once per frame
 	void FixedUpdate () {
@@ -47,7 +47,8 @@ public class FireScript : MonoBehaviour {
 						transform.localPosition = new Vector3 (0, 0, transform.localPosition.z - .06f  );
 
 
-		if (Input.GetButtonDown ("Submit")) 
-						Fire ();
+//		if (Input.GetButtonDown ("Submit")) 
+//						PhotonView.RPC ("Fire", PhotonTargets.MasterClient);			
+			//Fire ();
 }
 }

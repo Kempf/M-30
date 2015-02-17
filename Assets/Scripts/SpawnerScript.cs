@@ -16,7 +16,7 @@ public class SpawnerScript : MonoBehaviour {
 
 		Vector3 SpawnPos = transform.position + RandAng * Vector3.forward * Random.Range (DistMin, DistMax);
 
-		Instantiate (Target1, SpawnPos, transform.rotation);
+		PhotonNetwork.Instantiate ("Target1", SpawnPos, transform.rotation, 0);
 
 	}
 	

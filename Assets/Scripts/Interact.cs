@@ -5,50 +5,81 @@ using UnityEngine.UI;
 public class Interact : MonoBehaviour {
 	//raycast data
 	public RaycastHit hit;
-	//UI texts
-	public Text tagID;
-	public GameObject tagIDGO;
-	public Text Data;
-	public GameObject DataGO;
-	public Text Radio;
-	public GameObject RadioGO;
-	public Text Scoretxt;
-	public GameObject ScoretxtGO;
-	//Cameras
+
+	//UI Elements
+	private Canvas MainCanvas;
+	private GameObject MainCanvasGO;
+	private Canvas ScopeCanvas;
+	private GameObject ScopeCanvasGO;
+	private Text tagID;
+	private GameObject tagIDGO;
+	private Text Data;
+	private GameObject DataGO;
+	private Text Radio;
+	private GameObject RadioGO;
+	private Text Scoretxt;
+	private GameObject ScoretxtGO;
+	public static int Scoreint;
+
+	//Camera Related
 	public GameObject PlayerCamPos;
 	public GameObject ScopeCamPos;
 	private bool inScope;
 	public Camera Main;
-	public Canvas MainCanvas;
-	public GameObject MainCanvasGO;
-	public Canvas ScopeCanvas;
-	public GameObject ScopeCanvasGO;
-	//desired object help position
+
+	//Object held position
 	public GameObject Position;
-	//hands free? and what is in hands?
-	public bool HandsFree = true;
-	public string IteminHands;
-	//angles for elev and trav in 6000div format
-	private float ElevDiv;
-	private float TravDiv;
 
-	public GameObject Round;
-	
-	public int Scoreint;
+	//Item in hands Y/N? String
+	private bool HandsFree = true;
+	private string IteminHands;
+	//Angles for elev and trav in 6000div format
+	public static float TravDiv;
+	public static float ElevDiv;
 
+	//Player Game Object
 	public GameObject Player;
 
+	//Scripts on player controller
 	private MouseLook MouseLook1;
 	private MouseLook MouseLook2;
 	private FPSInputControllerC Controller;
 
-	private TraverseScript Trav;
+	//Traverse script on gun
 
+	private GunScript GunScript;
+
+	private float speed;
+
+	//private TraverseScript Trav;
+	private GameObject Trav;
+	private GameObject Elev;
+
+	private GameObject Barrel;
+
+	//Field of Views
 	public float NormFOV;
 	public float ScopeFOV;
 
-	// Use this for initialization
+	private bool Started;
+
 	void Awake () {
+		Started = false;
+	}
+
+	void StartedCheck (){
+		if (Started == false) {
+			PlayerStart ();
+			Started = true;
+		} else {
+			return;
+		}
+	}
+
+	// Use this for initialization
+	void PlayerStart () {
+
+		GunScript = GameObject.Find ("M-30(Clone)").GetComponent<GunScript> ();
 
 		MainCanvasGO = GameObject.Find ("Canvas - Main");
 		MainCanvas = MainCanvasGO.GetComponent<Canvas> ();
@@ -66,10 +97,10 @@ public class Interact : MonoBehaviour {
 		Scoretxt = ScoretxtGO.GetComponent<Text> ();
 
 		//clearing text
-		tagID.text = "";
-		Data.text = "";
-		Scoretxt.text = "0";
-		Scoreint = 0;
+		tagID.text = "tagID";
+		Data.text = "Data";
+		Radio.text = "Radio";
+		Scoretxt.text = Scoreint.ToString();
 
 		MouseLook1 = Player.GetComponent <MouseLook>();
 		MouseLook2 = PlayerCamPos.GetComponent <MouseLook>();
@@ -78,8 +109,10 @@ public class Interact : MonoBehaviour {
 		inScope = false;
 		ScopeCamPos = GameObject.Find ("ScopeCamPos");
 
-		Trav = GameObject.FindGameObjectWithTag ("Traverse").gameObject.GetComponent<TraverseScript> ();
+		Trav = GameObject.FindGameObjectWithTag ("Traverse");//.gameObject.GetComponent<TraverseScript> ();
+		Elev = GameObject.FindGameObjectWithTag ("Elevation");
 
+		Barrel = GameObject.Find ("Barrel");
 	}
 
 	public void AddScore(){
@@ -90,11 +123,20 @@ public class Interact : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-				
 
+		if (Input.GetButton ("Focus"))
+			speed = 2f;
+		else
+			speed = 0.3f;
 
-                Screen.lockCursor = true;
-				Screen.showCursor = false;
+		StartedCheck ();
+
+		if (Input.GetButtonDown ("Submit")) {
+			Barrel.GetComponent<PhotonView>().RPC ("FireCheck", PhotonTargets.MasterClient, null);
+		}
+
+        Screen.lockCursor = true;
+		Screen.showCursor = false;
         
 		if (inScope == false) {
 						//Raycast and hit ID
@@ -115,95 +157,83 @@ public class Interact : MonoBehaviour {
 				}
 
 		if (tagID.text == "Chamber" && IteminHands == "Position/Round(Clone)" && Input.GetButtonDown ("Interact 1") ) {
-			ChamberScript Cham = hit.collider.gameObject.GetComponent<ChamberScript> ();
-			if (Cham.Loaded == false){
-			//loading round into chamber
-					GameObject RoundtoLoad = transform.Find (IteminHands).gameObject;
-					Destroy (RoundtoLoad);
-				//	ChamberScript Cham = hit.collider.gameObject.GetComponent<ChamberScript> ();
-					Cham.Load ();
-					IteminHands = "";
-					HandsFree = true;
-			}
+			Chamber ();
 		}
 
 
 
 		//check if holding something
 		if (HandsFree == true) {
-						//checking tags etc.
-						if (tagID.text == "Elevation") {
-								//calling and using elevation script
-								ElevationScript Elev = hit.collider.gameObject.GetComponent<ElevationScript> ();
-								Elev.Interact1 ();
-								ElevDiv = Mathf.Round (Elev.Elevation * 16.666f);
-								Data.text = ElevDiv.ToString ();
+			//checking tags etc.
+			if (tagID.text == "Elevation") {
+				Elevation ();
+			} else if (tagID.text == "Traverse") {	
+				Traverse ();
+			} else if (tagID.text == "Round" && Input.GetButtonDown ("Interact 1")) {		
+				//picking up the round... figure it out
+				hit.collider.transform.position = Position.transform.position;
+				hit.collider.transform.parent = Position.transform;
+				hit.collider.transform.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+				hit.collider.enabled = false;
+				HandsFree = false;
+				IteminHands = "Position/Round(Clone)";
 
-						} else if (tagID.text == "Traverse") {		
-								//calling and using traverse script
-								//Trav = hit.collider.gameObject.GetComponent<TraverseScript> ();
-								Trav.Interact1 ();
-								TravDiv = Mathf.Round (Trav.Traverse * 16.666f);
-								Data.text = TravDiv.ToString ();
+			} else if (tagID.text == "Shell" && Input.GetButtonDown ("Interact 1")) {		
+				//picking up the shell... figure it out
+				hit.collider.transform.position = Position.transform.position;
+				hit.collider.transform.parent = Position.transform;
+				hit.collider.transform.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+				hit.collider.enabled = false;
+				HandsFree = false;
+				IteminHands = "Position/Shell(Clone)";
+
+			} else if (tagID.text == "Case" && Input.GetButtonDown ("Interact 1")) {		
+				//picking up the Case... figure it out
+				hit.collider.transform.position = Position.transform.position;
+				hit.collider.transform.parent = Position.transform;
+				hit.collider.transform.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+				hit.collider.enabled = false;
+				HandsFree = false;
+				IteminHands = "Position/Case(Clone)";
+
+			} else if (tagID.text == "Breech" && Input.GetButtonDown ("Interact 1")) {
+				//activating breechdoor script
+				hit.collider.gameObject.GetComponent<PhotonView>().RPC ("BreechChange", PhotonTargets.All, null);
+
+			} else if (tagID.text == "Scope") {
+				Traverse ();
+				if (Input.GetButtonDown ("Interact 1")){
+					//switching cams
+					MainCanvas.enabled = !MainCanvas.enabled;
+					ScopeCanvas.enabled = !ScopeCanvas.enabled;
+					inScope = !inScope;
+								
+		//			Main.enabled = !Main.enabled;
+		//			ScopeCam.enabled = !ScopeCam.enabled;
+
+					MouseLook1.enabled = !MouseLook1.enabled;
+					MouseLook2.enabled = !MouseLook2.enabled;
+					Controller.enabled = !Controller.enabled;
+					}
+			} else if (tagID.text == "Radio" && Input.GetButtonDown ("Interact 1")) {
+
+				string TargetDist = ObjectScript.DistString;
+				Radio.text = TargetDist;
+
+		//		GameObject Target = GameObject.FindGameObjectWithTag ("Target");	
+		//		ObjectScript script = Target.GetComponent<ObjectScript>() as ObjectScript; 
+		//		string DistString = script.DistString;
+		//		Radio.text = DistString;
+
+			} else if (tagID.text == "Ammo Box" && Input.GetButtonDown ("Interact 1")) {
 		
-						} else if (tagID.text == "Round" && Input.GetButtonDown ("Interact 1")) {		
-								//picking up the round... figure it out
-								hit.collider.transform.position = Position.transform.position;
-								hit.collider.transform.parent = Position.transform;
-								hit.collider.transform.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-								hit.collider.enabled = false;
-								HandsFree = false;
-								IteminHands = "Position/Round(Clone)";
-
-						} else if (tagID.text == "Shell" && Input.GetButtonDown ("Interact 1")) {		
-								//picking up the shell... figure it out
-								hit.collider.transform.position = Position.transform.position;
-								hit.collider.transform.parent = Position.transform;
-								hit.collider.transform.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-								hit.collider.enabled = false;
-								HandsFree = false;
-								IteminHands = "Position/Shell(Clone)";
-
-						} else if (tagID.text == "Case" && Input.GetButtonDown ("Interact 1")) {		
-								//picking up the Case... figure it out
-								hit.collider.transform.position = Position.transform.position;
-								hit.collider.transform.parent = Position.transform;
-								hit.collider.transform.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-								hit.collider.enabled = false;
-								HandsFree = false;
-								IteminHands = "Position/Case(Clone)";
-
-						} else if (tagID.text == "Breech" && Input.GetButtonDown ("Interact 1")) {
-								//activating breechdoor script
-								BreechScript Brch = hit.collider.gameObject.GetComponent<BreechScript> ();
-								Brch.Interact1 ();
-
-						} else if (tagID.text == "Scope") {
-								Trav.Interact1 ();
-								if (Input.GetButtonDown ("Interact 1")){
-								//switching cams
-								
-								MainCanvas.enabled = !MainCanvas.enabled;
-								ScopeCanvas.enabled = !ScopeCanvas.enabled;
-								inScope = !inScope;
-								
-					//			Main.enabled = !Main.enabled;
-					//			ScopeCam.enabled = !ScopeCam.enabled;
-
-								MouseLook1.enabled = !MouseLook1.enabled;
-								MouseLook2.enabled = !MouseLook2.enabled;
-								Controller.enabled = !Controller.enabled;
-								}
-						} else if (tagID.text == "Radio" && Input.GetButtonDown ("Interact 1")) {
-
-								GameObject Target = GameObject.FindGameObjectWithTag ("Target");	
-								ObjectScript script = Target.GetComponent<ObjectScript>() as ObjectScript; 
-								string DistString = script.DistString;
-								Radio.text = DistString;
-
-						} else {
-								Data.text = "";
-						}
+		//		GameObject AmmoBox = hit.collider.gameObject;
+				hit.collider.gameObject.GetComponent<PhotonView>().RPC ("SpawnRound", PhotonTargets.MasterClient, null);
+		//		AmmoBox.GetComponent<RoundSpawn>().SpawnRound ();
+							
+			} else {
+				Data.text = "";
+			}
 		}
 
 		if (tagID.text == "Case" && IteminHands == "Position/Shell(Clone)" && Input.GetButtonDown ("Interact 1")) {
@@ -212,23 +242,49 @@ public class Interact : MonoBehaviour {
 			GameObject Case = hit.collider.gameObject;
 			Vector3 Pos = Shell.transform.position;
 			Quaternion Rot = Shell.transform.rotation;
-			Destroy (Shell);
-			Destroy (Case);
+			PhotonNetwork.Destroy (Shell);
+			PhotonNetwork.Destroy (Case);
+		//	Destroy (Shell);
+		//	Destroy (Case);
 			IteminHands = "";
 			HandsFree = true;
-			Instantiate (Round, Pos, Rot);
+			PhotonNetwork.Instantiate ("Round",Pos, Rot, 0);
+		//	Instantiate (Round, Pos, Rot);
 		}
 
 		if (Input.GetButtonDown ("Interact 2")){
 			if (IteminHands != ""){
-			//dropping the object in hands
-			GameObject toDrop = transform.Find (IteminHands).gameObject;
-			toDrop.transform.parent = null;
-			toDrop.transform.rigidbody.constraints = RigidbodyConstraints.None;
-			toDrop.collider.enabled = true;
-			HandsFree = true;
-			IteminHands = "";
+				//dropping the object in hands
+				GameObject toDrop = transform.Find (IteminHands).gameObject;
+				toDrop.transform.parent = null;
+				toDrop.transform.rigidbody.constraints = RigidbodyConstraints.None;
+				toDrop.collider.enabled = true;
+				HandsFree = true;
+				IteminHands = "";
 			}	
+		}
+	}
+
+	void Traverse(){
+		Data.text = TravDiv.ToString ();
+		float TraverseMod;
+		TraverseMod = (Input.GetAxis ("Mouse Scroll"))/speed;
+		Trav.GetComponent<PhotonView> ().RPC ("Traverse", PhotonTargets.All, TraverseMod);
+	}
+	void Elevation(){
+		Data.text = ElevDiv.ToString ();
+		float ElevationMod;
+		ElevationMod = (Input.GetAxis ("Mouse Scroll"))/speed;
+		Elev.GetComponent<PhotonView> ().RPC ("Elevation", PhotonTargets.All, ElevationMod);	
+	}
+	void Chamber(){
+		if (ChamberScript.Loaded == false){
+			//loading round into chamber
+			hit.collider.gameObject.GetComponent<PhotonView>().RPC ("LoadRound", PhotonTargets.All, null);
+			GameObject RoundtoLoad = transform.Find (IteminHands).gameObject;
+			PhotonNetwork.Destroy (RoundtoLoad);
+			IteminHands = "";
+			HandsFree = true;
 		}
 	}
 }

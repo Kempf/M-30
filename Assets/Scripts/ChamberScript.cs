@@ -3,22 +3,18 @@ using System.Collections;
 
 public class ChamberScript : MonoBehaviour {
 
-	public bool Loaded;
+	public static bool Loaded;
 
-	// Use this for initialization
-	void Awake () {
-		Loaded = false;
-	}
-	
-	// Update is called once per frame
-	public void Load () {
+	[RPC]
+	public void LoadRound () {
 		Loaded = true;
 	}
 
 	void Update () {
-		if (Loaded == true)
-						renderer.enabled = true;
-				else
-						renderer.enabled = false;
+		if (Loaded == true) {
+			renderer.enabled = true;
+		}else{
+			renderer.enabled = false;
 		}
+	}
 }
