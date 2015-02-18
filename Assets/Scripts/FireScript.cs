@@ -16,28 +16,25 @@ public class FireScript : MonoBehaviour {
 	public void FireCheck(){
 		randX = Random.Range (-1f,1f) + Random.Range (-1f,1f) + Random.Range (-1f,1f);
 		randY = Random.Range (-1f,1f) + Random.Range (-1f,1f) + Random.Range (-1f,1f);
+		randRot.eulerAngles = new Vector3 (randX / 30, randY / 30, 0f);
 
 		if (ChamberScript.Loaded == true && BreechScript.open == false) {
-			GetComponent<PhotonView>().RPC ("Fire", PhotonTargets.All, randX, randY);
+			//spawn and lauch projectile
+			PhotonNetwork.Instantiate ("BulletPrefab", FirePos.transform.position, FirePos.transform.rotation * randRot, 0);
+			gameObject.GetComponent<PhotonView>().RPC ("FireEffects", PhotonTargets.All, randRot);
+	//		Rigidbody.Instantiate (Bullet, FirePos.transform.position, FirePos.transform.rotation * randRot);
+			//recoil
+			transform.localPosition = new Vector3 (0, 0, .6f);
+			//unloading
+			transform.Find ("ChamberCol").gameObject.GetComponent<PhotonView> ().RPC ("LoadRound", PhotonTargets.All, null);
+			transform.Find ("BreechDoor").gameObject.GetComponent<PhotonView> ().RPC ("UnloadBreech", PhotonTargets.All, null);
 		}
 	}
+
 	[RPC]
-	public void Fire(float randX, float randY){
-
-			randRot.eulerAngles = new Vector3 (randX/30, randY/30, 0f);
-
-				//prticle effects
-				pSFire.Play ();
-				//spawn and lauch projectile
-				Rigidbody.Instantiate (Bullet, FirePos.transform.position, FirePos.transform.rotation * randRot);
-				//recoil
-				transform.localPosition = new Vector3 (0, 0, .6f);
-				//unloading
-				ChamberScript Cham = transform.Find ("ChamberCol").gameObject.GetComponent<ChamberScript> ();
-				BreechScript Bree = transform.Find ("BreechDoor").gameObject.GetComponent<BreechScript> ();
-				ChamberScript.Loaded = false;
-				BreechScript.EmpCase = true;
-
+	public void FireEffects (Quaternion randRot) {
+		//prticle effects
+		pSFire.Play ();
 	}
 
 	// Update is called once per frame

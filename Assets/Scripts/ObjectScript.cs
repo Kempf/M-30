@@ -25,10 +25,11 @@ public class ObjectScript : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		if (Explosion = GameObject.FindGameObjectWithTag ("Explosion")) {
 
+		}
 	}
 
-	// Use this for initialization
 	public void ExplosionHandler () {
 		Explosion = GameObject.FindGameObjectWithTag ("Explosion") ;
 		Direction = Explosion.transform.position - transform.position;

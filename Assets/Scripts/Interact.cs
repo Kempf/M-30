@@ -56,6 +56,7 @@ public class Interact : MonoBehaviour {
 	private GameObject Elev;
 
 	private GameObject Barrel;
+	public static Quaternion randRot;
 
 	//Field of Views
 	public float NormFOV;
@@ -113,6 +114,8 @@ public class Interact : MonoBehaviour {
 		Elev = GameObject.FindGameObjectWithTag ("Elevation");
 
 		Barrel = GameObject.Find ("Barrel");
+
+		GameObject myPlayer = gameObject;
 	}
 
 	public void AddScore(){
@@ -132,7 +135,7 @@ public class Interact : MonoBehaviour {
 		StartedCheck ();
 
 		if (Input.GetButtonDown ("Submit")) {
-			Barrel.GetComponent<PhotonView>().RPC ("FireCheck", PhotonTargets.MasterClient, null);
+			FireCheck ();
 		}
 
         Screen.lockCursor = true;
@@ -254,13 +257,7 @@ public class Interact : MonoBehaviour {
 
 		if (Input.GetButtonDown ("Interact 2")){
 			if (IteminHands != ""){
-				//dropping the object in hands
-				GameObject toDrop = transform.Find (IteminHands).gameObject;
-				toDrop.transform.parent = null;
-				toDrop.transform.rigidbody.constraints = RigidbodyConstraints.None;
-				toDrop.collider.enabled = true;
-				HandsFree = true;
-				IteminHands = "";
+				gameObject.GetComponent<PhotonView>().RPC ("DropItem", PhotonTargets.All, null);
 			}	
 		}
 	}
@@ -286,5 +283,25 @@ public class Interact : MonoBehaviour {
 			IteminHands = "";
 			HandsFree = true;
 		}
+	}
+	[RPC]
+	void DropItem() {
+		//dropping the object in hands
+
+//		GameObject toDrop = myPlayer.transform.Find (IteminHands).gameObject;
+//		toDrop.transform.parent = null;
+//		toDrop.transform.rigidbody.constraints = RigidbodyConstraints.None;
+//		toDrop.collider.enabled = true;
+//		HandsFree = true;
+//		IteminHands = "";
+	}
+
+	[RPC]
+	void FireCheck (){
+		float randX = Random.Range (-1f,1f) + Random.Range (-1f,1f) + Random.Range (-1f,1f);
+		float randY = Random.Range (-1f,1f) + Random.Range (-1f,1f) + Random.Range (-1f,1f);
+		randRot.eulerAngles = new Vector3 (randX / 30, randY / 30, 0f);
+
+		Barrel.GetComponent<PhotonView>().RPC ("Fire", PhotonTargets.MasterClient, null);
 	}
 }

@@ -20,6 +20,11 @@ public class BreechScript : MonoBehaviour {
 		}
 	}
 
+	[RPC] 
+	public void UnloadBreech () {
+		EmpCase = true;
+	}
+
 	void Awake () {
 		open = false;
 		EmpCase = false;

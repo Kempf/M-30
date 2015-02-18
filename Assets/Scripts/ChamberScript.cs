@@ -7,9 +7,9 @@ public class ChamberScript : MonoBehaviour {
 
 	[RPC]
 	public void LoadRound () {
-		Loaded = true;
+		Loaded = !Loaded;
 	}
-
+	
 	void Update () {
 		if (Loaded == true) {
 			renderer.enabled = true;
