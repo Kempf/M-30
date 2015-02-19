@@ -39,7 +39,7 @@ public class ObjectScript : MonoBehaviour {
 		if (Distance < KillRad && doOnce == true) {
 			Destroy (gameObject, Distance / 2);
 			renderer.material.color = Color.black;
-			Interact.Scoreint += 1;
+			Interact.ScoreInt += 1;
 			doOnce = false;
 		}
 	}

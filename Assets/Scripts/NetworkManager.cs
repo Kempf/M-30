@@ -8,7 +8,8 @@ public class NetworkManager : MonoBehaviour {
 	public GameObject MenuCamera;
 	public GameObject Gameinterface;
 
-	private bool MakeGun = false;
+	private bool isMaster = false;
+
 
 	// Use this for initialization
 	void Start () {
@@ -20,7 +21,7 @@ public class NetworkManager : MonoBehaviour {
 
 		if (PersistantDetails.Multiplayer == false) {
 			print ("offline mode");
-			MakeGun = true;
+			isMaster = true;
 			PhotonNetwork.offlineMode = true;
 			PhotonNetwork.CreateRoom (null);
 		} else {
@@ -38,7 +39,7 @@ public class NetworkManager : MonoBehaviour {
 
 	void OnPhotonRandomJoinFailed () {
 		Debug.Log ("OnPhotonRandomJoinFailed");
-		MakeGun = true;
+		isMaster = true;
 		PhotonNetwork.CreateRoom (null);
 		}
 
@@ -49,18 +50,27 @@ public class NetworkManager : MonoBehaviour {
 		}
 
 	void SpawnMyPlayer(){
-		if (MakeGun == true){
+		if (isMaster == true) {
 			PhotonNetwork.Instantiate ("M-30", GSpawn.transform.position, GSpawn.transform.rotation, 0);
+			MenuCamera.SetActive (false);
+			Gameinterface.SetActive (true);
+			GameObject MyPlayer = PhotonNetwork.Instantiate ("PlayerM", PSpawn.transform.position, PSpawn.transform.rotation, 0);
+			MyPlayer.GetComponent <MouseLook> ().enabled = true;
+			MyPlayer.GetComponent <CharacterMotorC> ().enabled = true;
+			MyPlayer.GetComponent<FPSInputControllerC> ().enabled = true;
+			MyPlayer.GetComponent<CharacterController> ().enabled = true;
+			MyPlayer.GetComponentInChildren<MouseLook> ().enabled = true;
+			MyPlayer.transform.FindChild ("PlayerCamPos").gameObject.SetActive (true);
+		} else {
+			MenuCamera.SetActive (false);
+			Gameinterface.SetActive (true);
+			GameObject MyPlayer = PhotonNetwork.Instantiate ("Player", PSpawn.transform.position, PSpawn.transform.rotation, 0);
+			MyPlayer.GetComponent <MouseLook> ().enabled = true;
+			MyPlayer.GetComponent <CharacterMotorC> ().enabled = true;
+			MyPlayer.GetComponent<FPSInputControllerC> ().enabled = true;
+			MyPlayer.GetComponent<CharacterController> ().enabled = true;
+			MyPlayer.GetComponentInChildren<MouseLook> ().enabled = true;
+			MyPlayer.transform.FindChild ("PlayerCamPos").gameObject.SetActive (true);
 		}
-		MenuCamera.SetActive (false);
-		Gameinterface.SetActive (true);
-		GameObject MyPlayer = PhotonNetwork.Instantiate ("Player", PSpawn.transform.position, PSpawn.transform.rotation, 0);
-		MyPlayer.GetComponent <MouseLook> ().enabled = true;
-		MyPlayer.GetComponent <CharacterMotorC> ().enabled = true;
-		MyPlayer.GetComponent<FPSInputControllerC> ().enabled = true;
-		MyPlayer.GetComponent<CharacterController> ().enabled = true;
-		MyPlayer.GetComponentInChildren<MouseLook> ().enabled = true;
-		MyPlayer.transform.FindChild ("PlayerCamPos").gameObject.SetActive (true);
-
-		}
+	}
 }

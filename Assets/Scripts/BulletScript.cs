@@ -46,22 +46,19 @@ public class BulletScript : MonoBehaviour {
 				);
 			}
 
-				spin += 2;
-				GameObject Shell = transform.Find ("BulletGO").gameObject;
-				Shell.transform.localEulerAngles = new Vector3 (0f, 0f, -spin);
+			spin += 2;
+			GameObject Shell = transform.Find ("BulletGO").gameObject;
+			Shell.transform.localEulerAngles = new Vector3 (0f, 0f, -spin);
 
-				if (Physics.Raycast (transform.position, dir, out Hit, Time.deltaTime * rigidbody.velocity.magnitude)) {
-					gameObject.GetComponent<PhotonView> ().RPC ("Explode", PhotonTargets.MasterClient, null);
-					//		Explode ();
-				}
+			if (Physics.Raycast (transform.position, dir, out Hit, Time.deltaTime * rigidbody.velocity.magnitude)) {
+				gameObject.GetComponent<PhotonView> ().RPC ("Explode", PhotonTargets.MasterClient, null);
+			}
 		
-				lastPos = nowPos;
+			lastPos = nowPos;
 
 			}
 		}
-//	void OnCollisionEnter(Collision collision) {
-//		Explode ();
-//		}
+
 	[RPC]
 	public void Explode () {
 
@@ -71,13 +68,8 @@ public class BulletScript : MonoBehaviour {
 			if (hit && hit.rigidbody)
 				hit.rigidbody.AddExplosionForce (power, explosionPos, radius, 3.0F);
 		}
-
-		//destroy collider to stop collision spam
-	//	PhotonNetwork.Destroy (collider);
-//		Destroy (collider);
 		//create volumetric explosion sphere
 		PhotonNetwork.Instantiate ("Explosion", rigidbody.position, transform.rigidbody.rotation, 0);
-//		Instantiate (explosionSphere, rigidbody.position, transform.rigidbody.rotation);
 		//making it stay still
 		rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 		//print distance
@@ -90,12 +82,10 @@ public class BulletScript : MonoBehaviour {
 		}
 		//get rid of the object when it's all done
 		gameObject.GetComponent<PhotonView> ().RPC ("DestroyBullet", PhotonTargets.MasterClient, null);
-//		Destroy (gameObject);
 
 		}
 	[RPC]
 	public void DestroyBullet(){
 		PhotonNetwork.Destroy (gameObject);
 	}
-
 }

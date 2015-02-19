@@ -19,7 +19,8 @@ public class Interact : MonoBehaviour {
 	private GameObject RadioGO;
 	private Text Scoretxt;
 	private GameObject ScoretxtGO;
-	public static int Scoreint;
+
+	public static int ScoreInt = 0;
 
 	//Camera Related
 	public GameObject PlayerCamPos;
@@ -39,15 +40,13 @@ public class Interact : MonoBehaviour {
 
 	//Player Game Object
 	public GameObject Player;
+	public GameObject PlayerM;
+	public GameObject PlayerMIC;
 
 	//Scripts on player controller
 	private MouseLook MouseLook1;
 	private MouseLook MouseLook2;
 	private FPSInputControllerC Controller;
-
-	//Traverse script on gun
-
-	private GunScript GunScript;
 
 	private float speed;
 
@@ -80,7 +79,8 @@ public class Interact : MonoBehaviour {
 	// Use this for initialization
 	void PlayerStart () {
 
-		GunScript = GameObject.Find ("M-30(Clone)").GetComponent<GunScript> ();
+//		PlayerM = PhotonView.Get (GameObject PlayerM);
+//		PlayerMIC = PlayerM.transform.Find ("PlayerM(Clone)/PlayerCamPos/Main Camera/Interact Control");
 
 		MainCanvasGO = GameObject.Find ("Canvas - Main");
 		MainCanvas = MainCanvasGO.GetComponent<Canvas> ();
@@ -101,7 +101,7 @@ public class Interact : MonoBehaviour {
 		tagID.text = "tagID";
 		Data.text = "Data";
 		Radio.text = "Radio";
-		Scoretxt.text = Scoreint.ToString();
+		Scoretxt.text = ScoreInt.ToString();
 
 		MouseLook1 = Player.GetComponent <MouseLook>();
 		MouseLook2 = PlayerCamPos.GetComponent <MouseLook>();
@@ -115,24 +115,20 @@ public class Interact : MonoBehaviour {
 
 		Barrel = GameObject.Find ("Barrel");
 
-		GameObject myPlayer = gameObject;
+		Player = gameObject;
 	}
-
-	public void AddScore(){
-		Scoreint += 1;
-		Scoretxt.text = Scoreint.ToString ();
-        Radio.text = "";
-		}
 
 	// Update is called once per frame
 	void Update () {
+
+		StartedCheck ();
+
+		Scoretxt.text = ScoreInt.ToString();
 
 		if (Input.GetButton ("Focus"))
 			speed = 2f;
 		else
 			speed = 0.3f;
-
-		StartedCheck ();
 
 		if (Input.GetButtonDown ("Submit")) {
 			FireCheck ();
@@ -159,7 +155,7 @@ public class Interact : MonoBehaviour {
 						Main.camera.fieldOfView = ScopeFOV;
 				}
 
-		if (tagID.text == "Chamber" && IteminHands == "Position/Round(Clone)" && Input.GetButtonDown ("Interact 1") ) {
+		if (tagID.text == "Chamber" && IteminHands == "Position/RoundA(Clone)" && Input.GetButtonDown ("Interact 1") ) {
 			Chamber ();
 		}
 
@@ -170,18 +166,17 @@ public class Interact : MonoBehaviour {
 			//checking tags etc.
 			if (tagID.text == "Elevation") {
 				Elevation ();
-			} else if (tagID.text == "Traverse") {	
+			} else if (tagID.text == "Traverse") {
 				Traverse ();
-			} else if (tagID.text == "Round" && Input.GetButtonDown ("Interact 1")) {		
+			} else if (tagID.text == "Round" && Input.GetButtonDown ("Interact 1")) {
 				//picking up the round... figure it out
-				hit.collider.transform.position = Position.transform.position;
-				hit.collider.transform.parent = Position.transform;
-				hit.collider.transform.rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-				hit.collider.enabled = false;
+				hit.collider.GetComponent<PhotonView>().RPC ("DestroyRound", PhotonTargets.MasterClient, null);
+				GameObject RoundA = PhotonNetwork.Instantiate("RoundA", Position.transform.position, Quaternion.identity, 0);
+				RoundA.transform.parent = Position.transform;
 				HandsFree = false;
-				IteminHands = "Position/Round(Clone)";
+				IteminHands = "Position/RoundA(Clone)";
 
-			} else if (tagID.text == "Shell" && Input.GetButtonDown ("Interact 1")) {		
+			} else if (tagID.text == "Shell" && Input.GetButtonDown ("Interact 1")) {
 				//picking up the shell... figure it out
 				hit.collider.transform.position = Position.transform.position;
 				hit.collider.transform.parent = Position.transform;
@@ -190,7 +185,7 @@ public class Interact : MonoBehaviour {
 				HandsFree = false;
 				IteminHands = "Position/Shell(Clone)";
 
-			} else if (tagID.text == "Case" && Input.GetButtonDown ("Interact 1")) {		
+			} else if (tagID.text == "Case" && Input.GetButtonDown ("Interact 1")) {
 				//picking up the Case... figure it out
 				hit.collider.transform.position = Position.transform.position;
 				hit.collider.transform.parent = Position.transform;
@@ -257,7 +252,11 @@ public class Interact : MonoBehaviour {
 
 		if (Input.GetButtonDown ("Interact 2")){
 			if (IteminHands != ""){
-				gameObject.GetComponent<PhotonView>().RPC ("DropItem", PhotonTargets.All, null);
+				PhotonNetwork.Destroy (transform.Find (IteminHands).gameObject);
+				HandsFree = true;
+				IteminHands = "";
+
+				gameObject.GetComponent<PhotonView>().RPC ("DropItem", PhotonTargets.MasterClient, null);
 			}	
 		}
 	}
@@ -279,21 +278,23 @@ public class Interact : MonoBehaviour {
 			//loading round into chamber
 			hit.collider.gameObject.GetComponent<PhotonView>().RPC ("LoadRound", PhotonTargets.All, null);
 			GameObject RoundtoLoad = transform.Find (IteminHands).gameObject;
-			PhotonNetwork.Destroy (RoundtoLoad);
+			RoundtoLoad.GetComponent<PhotonView>().RPC ("DestroyRound", PhotonTargets.MasterClient, null);
+	//		PhotonNetwork.Destroy (RoundtoLoad);
 			IteminHands = "";
 			HandsFree = true;
 		}
 	}
 	[RPC]
-	void DropItem() {
+	public void DropItem () {
 		//dropping the object in hands
+
+		PhotonNetwork.Instantiate ("Round", gameObject.transform.position, Quaternion.identity, 0);
 
 //		GameObject toDrop = myPlayer.transform.Find (IteminHands).gameObject;
 //		toDrop.transform.parent = null;
 //		toDrop.transform.rigidbody.constraints = RigidbodyConstraints.None;
 //		toDrop.collider.enabled = true;
-//		HandsFree = true;
-//		IteminHands = "";
+
 	}
 
 	[RPC]
